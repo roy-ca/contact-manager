@@ -1,9 +1,8 @@
 package com.contactmanager.backend.controller;
 
 import com.contactmanager.backend.model.Contact;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -11,11 +10,32 @@ import java.util.*;
 @RequestMapping("/contacts")
 public class ContactController {
 
+    List<Contact> contacts;
+    private Integer counter;
+
+    ContactController() {
+        contacts = new ArrayList<>();
+        counter = 0;
+    }
+
     @GetMapping
     public List<Contact> getContacts() {
-        List<Contact> list = new ArrayList<>();
-        list.add(new Contact("Roy", "8848431405"));
-        list.add(new Contact("Nikita", "5565"));
-        return list;
+        return contacts;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Contact> getContact(@PathVariable int id) {
+        return contacts.stream()
+                .filter(c -> c.getId() == id)
+                .findFirst()
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public Contact createContact(@RequestBody Contact contact) {
+        contact.setId(++counter);
+        contacts.add(contact);
+        return contact;
     }
 }
