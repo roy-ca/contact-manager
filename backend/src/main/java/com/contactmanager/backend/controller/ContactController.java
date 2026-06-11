@@ -38,4 +38,35 @@ public class ContactController {
         contacts.add(contact);
         return contact;
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Contact> updateContact(@PathVariable int id, @RequestBody Contact updatedContact) {
+        Optional<Contact> existing = contacts.stream()
+                .filter(c -> c.getId() == id)
+                .findFirst();
+
+        if(existing.isPresent()) {
+            Contact c = existing.get();
+            c.setName(updatedContact.getName());
+            c.setPhone(updatedContact.getPhone());
+
+            return ResponseEntity.ok(c);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteContact(@PathVariable int id) {
+        Optional<Contact> contactToDelete = contacts.stream()
+                .filter(c -> c.getId() == id)
+                .findFirst();
+
+        if(contactToDelete.isPresent()) {
+            Contact c = contactToDelete.get();
+            contacts.remove(c);
+
+           return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
